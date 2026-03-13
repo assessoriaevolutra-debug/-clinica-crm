@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM — Clínica Odontológica</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F2;
+    --bone: #EDE8DF;
+    --gold: #B8975A;
+    --gold-light: #D4B47A;
+    --dark: #1C1A17;
+    --charcoal: #2E2C28;
+    --muted: #7A7570;
+    --white: #FFFFFF;
+    --green: #4A7C59;
+    --red: #8B3A3A;
+    --blue: #3A5F8B;
+    --shadow: 0 4px 24px rgba(28,26,23,0.10);
+    --radius: 14px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: var(--charcoal);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0 24px;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 0 28px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .sidebar-logo h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--gold-light);
+    line-height: 1.3;
+  }
+  .sidebar-logo p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+  .sidebar-nav {
+    padding: 24px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    transition: all 0.18s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: var(--gold); color: var(--white); }
+  .nav-item .icon { font-size: 17px; width: 22px; text-align: center; }
+  .sidebar-footer {
+    padding: 20px 28px 0;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* MAIN */
+  .main {
+    margin-left: 260px;
+    flex: 1;
+    padding: 36px 40px;
+    min-height: 100vh;
+  }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* HEADER */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+  .page-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--dark);
+  }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* CARDS */
+  .cards-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--gold);
+  }
+  .stat-card .label { font-size: 12px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; }
+  .stat-card .value { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--dark); margin-top: 6px; }
+  .stat-card .sub { font-size: 12px; color: var(--green); margin-top: 4px; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--dark);
+    margin-bottom: 16px;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    background: var(--bone);
+    border-bottom: 1px solid var(--bone);
+  }
+  tbody td {
+    padding: 14px 18px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--bone);
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #faf8f4; }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .badge-green { background: #e8f5ee; color: #2e7d52; }
+  .badge-gold { background: #fdf3e0; color: #9a6f28; }
+  .badge-red { background: #fbeaea; color: var(--red); }
+  .badge-blue { background: #e8eef8; color: var(--blue); }
+  .badge-purple { background: #f0e8f8; color: #6a3a9a; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-gold { background: var(--gold); color: var(--white); }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-ghost { background: var(--bone); color: var(--dark); }
+  .btn-ghost:hover { background: #ddd8ce; }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .btn-red { background: #fbeaea; color: var(--red); }
+  .btn-red:hover { background: #f5d5d5; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(28,26,23,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 36px;
+    width: 540px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(28,26,23,0.2);
+    animation: slideIn 0.22s ease;
+  }
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 24px; color: var(--dark); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 10px 14px;
+    border: 1.5px solid var(--bone);
+    border-radius: 9px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--dark);
+    background: var(--cream);
+    transition: border 0.15s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); background: var(--white); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+  /* REMINDER CARD */
+  .reminder-list { display: flex; flex-direction: column; gap: 12px; }
+  .reminder-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    border-left: 4px solid var(--gold);
+  }
+  .reminder-card.urgent { border-left-color: var(--red); }
+  .reminder-card.done { border-left-color: var(--green); opacity: 0.65; }
+  .reminder-icon { font-size: 24px; width: 36px; text-align: center; }
+  .reminder-info { flex: 1; }
+  .reminder-info strong { font-size: 15px; font-weight: 600; }
+  .reminder-info p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .reminder-time { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  /* AGENDA GRID */
+  .agenda-header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .agenda-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+  }
+  .day-col { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+  .day-col-header {
+    padding: 10px 12px;
+    background: var(--bone);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-align: center;
+  }
+  .day-col-header span { display: block; font-size: 18px; font-family: 'Playfair Display', serif; color: var(--dark); margin-top: 2px; }
+  .day-col-header.today { background: var(--gold); }
+  .day-col-header.today, .day-col-header.today span { color: var(--white); }
+  .appt-slot {
+    padding: 9px 12px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--bone);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .appt-slot:hover { background: #faf8f4; }
+  .appt-slot .appt-time { font-weight: 700; color: var(--gold); font-size: 11px; }
+  .appt-slot .appt-name { font-weight: 600; color: var(--dark); }
+  .appt-slot .appt-spec { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  /* PATIENT LIST */
+  .search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .search-bar input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1.5px solid var(--bone);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    background: var(--white);
+  }
+  .search-bar input:focus { border-color: var(--gold); }
+
+  /* SPECIALTIES */
+  .spec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .spec-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border-top: 3px solid var(--gold);
+  }
+  .spec-card:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(28,26,23,0.13); }
+  .spec-card .spec-icon { font-size: 28px; }
+  .spec-card h4 { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+  .spec-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--charcoal);
+    color: var(--white);
+    padding: 14px 22px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    z-index: 999;
+    display: none;
+    animation: toastIn 0.2s ease;
+  }
+  @keyframes toastIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: none; } }
+  .toast.show { display: block; }
+
+  /* RESPONSIVE TWEAKS */
+  @media (max-width: 900px) {
+    .cards-row { grid-template-columns: repeat(2,1fr); }
+    .agenda-grid { grid-template-columns: repeat(3,1fr); }
+    .spec-grid { grid-template-columns: repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>🦷 Clínica<br>Odontológica</h1>
+    <p>CRO-GO 6420 · Dr. Adalberto Constantino</p>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" onclick="goTo('dashboard')">
+      <span class="icon">📊</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="goTo('agenda')">
+      <span class="icon">📅</span> Agenda
+    </button>
+    <button class="nav-item" onclick="goTo('consultas')">
+      <span class="icon">🗓</span> Consultas
+    </button>
+    <button class="nav-item" onclick="goTo('pacientes')">
+      <span class="icon">👤</span> Pacientes
+    </button>
+    <button class="nav-item" onclick="goTo('lembretes')">
+      <span class="icon">🔔</span> Lembretes
+    </button>
+    <button class="nav-item" onclick="goTo('especialidades')">
+      <span class="icon">🦴</span> Especialidades
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <p>⏰ Seg–Sex: 9h30–19h30</p>
+    <p style="margin-top:6px;">📍 Rua José Teixeira, Qd.08, Lt.24, nº33<br>Cond. Rio Branco — Goiânia/GO</p>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <section class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div>
+        <h2>Dashboard</h2>
+        <p id="dash-date"></p>
+      </div>
+      <button class="btn btn-gold" onclick="openModal('modal-consulta')">＋ Nova Consulta</button>
+    </div>
+    <div class="cards-row">
+      <div class="stat-card">
+        <div class="label">Pacientes</div>
+        <div class="value" id="stat-pacientes">0</div>
+        <div class="sub">cadastrados</div>
+      </div>
+      <div class="stat-card" style="border-color:var(--green)">
+        <div class="label">Hoje</div>
+        <div class="value" id="stat-hoje">0</div>
+        <div class="sub">consultas</div>
+      </div>
+      <div class="stat-card" style="border-color:var(--blue)">
+        <div class="label">Esta Semana</div>
+        <div class="value" id="stat-semana">0</div>
+        <div class="sub">agendamentos</div>
+      </div>
+      <div class="stat-card" style="border-color:var(--red)">
+        <div class="label">Lembretes</div>
+        <div class="value" id="stat-lembretes">0</div>
+        <div class="sub">pendentes</div>
+      </div>
+    </div>
+    <div class="section-title">Próximas Consultas</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>Data & Hora</th>
+            <th>Especialidade</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="dash-consultas-tbody">
+          <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px">Nenhuma consulta cadastrada ainda.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- AGENDA -->
+  <section class="page" id="page-agenda">
+    <div class="page-header">
+      <div><h2>Agenda Semanal</h2><p>Visão da semana atual</p></div>
+      <button class="btn btn-gold" onclick="openModal('modal-consulta')">＋ Agendar</button>
+    </div>
+    <div class="agenda-grid" id="agenda-grid"></div>
+  </section>
+
+  <!-- CONSULTAS -->
+  <section class="page" id="page-consultas">
+    <div class="page-header">
+      <div><h2>Consultas</h2><p>Gerenciar todos os agendamentos</p></div>
+      <button class="btn btn-gold" onclick="openModal('modal-consulta')">＋ Nova Consulta</button>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="search-consultas" placeholder="Buscar por paciente ou especialidade…" oninput="renderConsultasTable()">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>Telefone</th>
+            <th>Data & Hora</th>
+            <th>Especialidade</th>
+            <th>Obs.</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="consultas-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PACIENTES -->
+  <section class="page" id="page-pacientes">
+    <div class="page-header">
+      <div><h2>Pacientes</h2><p>Cadastro e histórico</p></div>
+      <button class="btn btn-gold" onclick="openModal('modal-paciente')">＋ Novo Paciente</button>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="search-pacientes" placeholder="Buscar paciente…" oninput="renderPacientesTable()">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Telefone</th>
+            <th>Nascimento</th>
+            <th>Última Consulta</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="pacientes-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- LEMBRETES -->
+  <section class="page" id="page-lembretes">
+    <div class="page-header">
+      <div><h2>Lembretes</h2><p>Confirmações e retornos</p></div>
+      <button class="btn btn-gold" onclick="openModal('modal-lembrete')">＋ Novo Lembrete</button>
+    </div>
+    <div class="reminder-list" id="lembretes-list">
+      <p style="color:var(--muted);font-size:14px">Nenhum lembrete cadastrado.</p>
+    </div>
+  </section>
+
+  <!-- ESPECIALIDADES -->
+  <section class="page" id="page-especialidades">
+    <div class="page-header">
+      <div><h2>Especialidades</h2><p>Serviços oferecidos pela clínica</p></div>
+    </div>
+    <div class="spec-grid" id="spec-grid"></div>
+  </section>
+
+</main>
+
+<!-- MODAL NOVA CONSULTA -->
+<div class="modal-overlay" id="modal-consulta">
+  <div class="modal">
+    <h3>📅 Agendar Consulta</h3>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Paciente</label>
+        <select id="c-paciente">
+          <option value="">Selecione o paciente…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="c-data">
+      </div>
+      <div class="form-group">
+        <label>Hora</label>
+        <input type="time" id="c-hora" min="09:30" max="19:30">
+      </div>
+      <div class="form-group full">
+        <label>Especialidade</label>
+        <select id="c-especialidade"></select>
+      </div>
+      <div class="form-group full">
+        <label>Observações</label>
+        <textarea id="c-obs" placeholder="Informações adicionais…"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Status</label>
+        <select id="c-status">
+          <option value="Agendado">Agendado</option>
+          <option value="Confirmado">Confirmado</option>
+          <option value="Realizado">Realizado</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-consulta')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveConsulta()">Salvar Consulta</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO PACIENTE -->
+<div class="modal-overlay" id="modal-paciente">
+  <div class="modal">
+    <h3>👤 Novo Paciente</h3>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nome Completo</label>
+        <input type="text" id="p-nome" placeholder="Nome do paciente">
+      </div>
+      <div class="form-group">
+        <label>CPF</label>
+        <input type="text" id="p-cpf" placeholder="000.000.000-00">
+      </div>
+      <div class="form-group">
+        <label>Data de Nascimento</label>
+        <input type="date" id="p-nasc">
+      </div>
+      <div class="form-group">
+        <label>Telefone / WhatsApp</label>
+        <input type="text" id="p-tel" placeholder="(62) 9 0000-0000">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="p-email" placeholder="email@exemplo.com">
+      </div>
+      <div class="form-group full">
+        <label>Observações / Histórico</label>
+        <textarea id="p-obs" placeholder="Alergias, condições médicas, histórico odontológico…"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-paciente')">Cancelar</button>
+      <button class="btn btn-gold" onclick="savePaciente()">Cadastrar Paciente</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LEMBRETE -->
+<div class="modal-overlay" id="modal-lembrete">
+  <div class="modal">
+    <h3>🔔 Novo Lembrete</h3>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Paciente</label>
+        <select id="l-paciente">
+          <option value="">Selecione o paciente…</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Tipo de Lembrete</label>
+        <select id="l-tipo">
+          <option>Confirmação de Consulta</option>
+          <option>Retorno</option>
+          <option>Pagamento Pendente</option>
+          <option>Exame Pré-operatório</option>
+          <option>Pós-operatório</option>
+          <option>Aniversário</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="l-data">
+      </div>
+      <div class="form-group">
+        <label>Hora</label>
+        <input type="time" id="l-hora">
+      </div>
+      <div class="form-group full">
+        <label>Mensagem</label>
+        <textarea id="l-msg" placeholder="Texto do lembrete ou observação…"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-lembrete')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveLembrete()">Salvar Lembrete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA STORE
+// ============================================================
+let pacientes = JSON.parse(localStorage.getItem('pacientes') || '[]');
+let consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
+let lembretes = JSON.parse(localStorage.getItem('lembretes') || '[]');
+
+const ESPECIALIDADES = [
+  { nome: 'Clínica Geral', icon: '🦷', desc: 'Avaliação, diagnóstico e tratamentos gerais.' },
+  { nome: 'Restaurações', icon: '🔧', desc: 'Tratamento de cáries e restaurações dentárias.' },
+  { nome: 'Facetas', icon: '✨', desc: 'Facetas de porcelana ou resina para estética.' },
+  { nome: 'Próteses', icon: '🦴', desc: 'Próteses dentárias fixas e removíveis.' },
+  { nome: 'Endodontia (Canal)', icon: '🔬', desc: 'Tratamento de canal dentário.' },
+  { nome: 'Ortodontia (Aparelho)', icon: '😬', desc: 'Aparelho fixo, móvel e alinhadores.' },
+  { nome: 'Implante', icon: '⚙️', desc: 'Instalação de implantes, prótese sobre implante, protocolo e enxerto ósseo.' },
+  { nome: 'Cirurgia Geral', icon: '🏥', desc: 'Extrações, lipo de papada, bichectomia e outras.' },
+  { nome: 'Periodontia', icon: '🌿', desc: 'Raspagem, gengivectomia, enxerto gengival e tunificação.' },
+  { nome: 'Harmonização Facial', icon: '💆', desc: 'Botox, preenchimento labial/facial, bioestimulador, PRF e fios de sustentação.' },
+];
+
+const STATUS_BADGE = {
+  'Agendado':  'badge-gold',
+  'Confirmado': 'badge-blue',
+  'Realizado':  'badge-green',
+  'Cancelado':  'badge-red',
+};
+
+function save() {
+  localStorage.setItem('pacientes', JSON.stringify(pacientes));
+  localStorage.setItem('consultas', JSON.stringify(consultas));
+  localStorage.setItem('lembretes', JSON.stringify(lembretes));
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.trim().toLowerCase().includes(page.slice(0,4))) n.classList.add('active');
+  });
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'agenda') renderAgenda();
+  if (page === 'consultas') renderConsultasTable();
+  if (page === 'pacientes') renderPacientesTable();
+  if (page === 'lembretes') renderLembretes();
+  if (page === 'especialidades') renderEspecialidades();
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id) {
+  populateSelects();
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+function populateSelects() {
+  ['c-paciente','l-paciente'].forEach(sid => {
+    const sel = document.getElementById(sid);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Selecione o paciente…</option>';
+    pacientes.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.nome;
+      sel.appendChild(opt);
+    });
+    sel.value = cur;
+  });
+  const cEsp = document.getElementById('c-especialidade');
+  if (cEsp) {
+    cEsp.innerHTML = '';
+    ESPECIALIDADES.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.nome;
+      opt.textContent = e.icon + ' ' + e.nome;
+      cEsp.appendChild(opt);
+    });
+  }
+}
+
+// ============================================================
+// CONSULTAS
+// ============================================================
+function saveConsulta() {
+  const pId = document.getElementById('c-paciente').value;
+  const data = document.getElementById('c-data').value;
+  const hora = document.getElementById('c-hora').value;
+  const esp  = document.getElementById('c-especialidade').value;
+  const obs  = document.getElementById('c-obs').value;
+  const stat = document.getElementById('c-status').value;
+  if (!pId || !data || !hora || !esp) { toast('⚠️ Preencha os campos obrigatórios.'); return; }
+  const pac = pacientes.find(p => p.id === pId);
+  consultas.push({ id: uid(), pacienteId: pId, pacienteNome: pac.nome, pacienteTel: pac.tel, data, hora, especialidade: esp, obs, status: stat });
+  save();
+  closeModal('modal-consulta');
+  document.getElementById('c-paciente').value = '';
+  document.getElementById('c-data').value = '';
+  document.getElementById('c-hora').value = '';
+  document.getElementById('c-obs').value = '';
+  toast('✅ Consulta agendada com sucesso!');
+  renderDashboard();
+}
+
+function deleteConsulta(id) {
+  consultas = consultas.filter(c => c.id !== id);
+  save();
+  renderConsultasTable();
+  renderDashboard();
+  toast('🗑 Consulta removida.');
+}
+
+function changeStatus(id, val) {
+  const c = consultas.find(x => x.id === id);
+  if (c) { c.status = val; save(); renderConsultasTable(); renderDashboard(); }
+}
+
+// ============================================================
+// WHATSAPP
+// ============================================================
+function limparTel(tel) {
+  return tel ? tel.replace(/\D/g,'') : '';
+}
+
+function sendWhatsAppConsulta(id) {
+  const c = consultas.find(x => x.id === id);
+  if (!c) return;
+  const tel = limparTel(c.pacienteTel);
+  if (!tel) { toast('⚠️ Paciente sem telefone cadastrado!'); return; }
+  const msg = encodeURIComponent(
+`Olá, ${c.pacienteNome}! 👋
+
+Lembramos que você tem consulta agendada na *Clínica Dr. Adalberto Constantino* 🦷
+
+📋 *Especialidade:* ${c.especialidade}
+📅 *Data:* ${formatDate(c.data)}
+⏰ *Horário:* ${c.hora}
+📍 *Endereço:* Rua José Teixeira, Qd.08, Lt.24, nº33 — Cond. Rio Branco, Goiânia/GO
+
+Por favor, responda *SIM* para confirmar ou *NÃO* para cancelar/remarcar.
+
+Aguardamos você! 😊`
+  );
+  const num = tel.startsWith('55') ? tel : '55' + tel;
+  window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+  toast('📱 WhatsApp aberto com mensagem pronta!');
+}
+
+function sendWhatsAppLembrete(id) {
+  const l = lembretes.find(x => x.id === id);
+  if (!l) return;
+  const pac = pacientes.find(p => p.id === l.pacienteId);
+  const tel = limparTel(pac?.tel);
+  if (!tel) { toast('⚠️ Paciente sem telefone cadastrado!'); return; }
+  const msg = encodeURIComponent(
+`Olá, ${l.pacienteNome}! 👋
+
+*${l.tipo}* — Clínica Dr. Adalberto Constantino 🦷
+
+📅 *Data:* ${formatDate(l.data)}${l.hora ? '\n⏰ *Horário:* ' + l.hora : ''}
+${l.msg ? '\n💬 ' + l.msg : ''}
+
+📍 Rua José Teixeira, Qd.08, Lt.24, nº33 — Cond. Rio Branco, Goiânia/GO
+📞 Qualquer dúvida, estamos à disposição!`
+  );
+  const num = tel.startsWith('55') ? tel : '55' + tel;
+  window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+  toast('📱 WhatsApp aberto com mensagem pronta!');
+}
+
+function renderConsultasTable() {
+  const q = (document.getElementById('search-consultas')?.value || '').toLowerCase();
+  const tbody = document.getElementById('consultas-tbody');
+  const list = consultas.filter(c =>
+    c.pacienteNome.toLowerCase().includes(q) || c.especialidade.toLowerCase().includes(q)
+  ).sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">Nenhuma consulta encontrada.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(c => `
+    <tr>
+      <td><strong>${c.pacienteNome}</strong></td>
+      <td>${c.pacienteTel || '—'}</td>
+      <td>${formatDate(c.data)} às ${c.hora}</td>
+      <td>${c.especialidade}</td>
+      <td style="color:var(--muted);font-size:12px">${c.obs || '—'}</td>
+      <td>
+        <select class="badge ${STATUS_BADGE[c.status]||'badge-gold'}" style="border:none;background:transparent;font-weight:600;font-size:11px;cursor:pointer" onchange="changeStatus('${c.id}',this.value)">
+          ${['Agendado','Confirmado','Realizado','Cancelado'].map(s=>`<option${s===c.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td style="display:flex;gap:6px;align-items:center">
+        <button class="btn btn-sm" style="background:#25D366;color:#fff;font-size:13px" onclick="sendWhatsAppConsulta('${c.id}')" title="Enviar lembrete via WhatsApp">📱</button>
+        <button class="btn btn-sm btn-red" onclick="deleteConsulta('${c.id}')">✕</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// PACIENTES
+// ============================================================
+function savePaciente() {
+  const nome = document.getElementById('p-nome').value.trim();
+  const cpf  = document.getElementById('p-cpf').value.trim();
+  const nasc = document.getElementById('p-nasc').value;
+  const tel  = document.getElementById('p-tel').value.trim();
+  const email= document.getElementById('p-email').value.trim();
+  const obs  = document.getElementById('p-obs').value.trim();
+  if (!nome) { toast('⚠️ Informe o nome do paciente.'); return; }
+  pacientes.push({ id: uid(), nome, cpf, nasc, tel, email, obs, cadastro: new Date().toISOString() });
+  save();
+  closeModal('modal-paciente');
+  ['p-nome','p-cpf','p-nasc','p-tel','p-email','p-obs'].forEach(id => document.getElementById(id).value = '');
+  toast('✅ Paciente cadastrado!');
+  renderPacientesTable();
+  renderDashboard();
+}
+
+function deletePaciente(id) {
+  pacientes = pacientes.filter(p => p.id !== id);
+  consultas = consultas.filter(c => c.pacienteId !== id);
+  save();
+  renderPacientesTable();
+  toast('🗑 Paciente removido.');
+}
+
+function renderPacientesTable() {
+  const q = (document.getElementById('search-pacientes')?.value || '').toLowerCase();
+  const tbody = document.getElementById('pacientes-tbody');
+  const list = pacientes.filter(p => p.nome.toLowerCase().includes(q));
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Nenhum paciente encontrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(p => {
+    const ultC = consultas.filter(c => c.pacienteId === p.id).sort((a,b)=>b.data.localeCompare(a.data))[0];
+    return `
+    <tr>
+      <td><strong>${p.nome}</strong></td>
+      <td>${p.cpf || '—'}</td>
+      <td>${p.tel || '—'}</td>
+      <td>${p.nasc ? formatDate(p.nasc) : '—'}</td>
+      <td>${ultC ? formatDate(ultC.data) + ' – ' + ultC.especialidade : '—'}</td>
+      <td><button class="btn btn-sm btn-red" onclick="deletePaciente('${p.id}')">Remover</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// LEMBRETES
+// ============================================================
+function saveLembrete() {
+  const pId  = document.getElementById('l-paciente').value;
+  const tipo = document.getElementById('l-tipo').value;
+  const data = document.getElementById('l-data').value;
+  const hora = document.getElementById('l-hora').value;
+  const msg  = document.getElementById('l-msg').value;
+  if (!pId || !data) { toast('⚠️ Selecione o paciente e a data.'); return; }
+  const pac = pacientes.find(p => p.id === pId);
+  lembretes.push({ id: uid(), pacienteId: pId, pacienteNome: pac.nome, tipo, data, hora, msg, done: false });
+  save();
+  closeModal('modal-lembrete');
+  toast('🔔 Lembrete criado!');
+  renderLembretes();
+  renderDashboard();
+}
+
+function toggleLembrete(id) {
+  const l = lembretes.find(x => x.id === id);
+  if (l) { l.done = !l.done; save(); renderLembretes(); renderDashboard(); }
+}
+
+function deleteLembrete(id) {
+  lembretes = lembretes.filter(l => l.id !== id);
+  save();
+  renderLembretes();
+  renderDashboard();
+  toast('🗑 Lembrete removido.');
+}
+
+function renderLembretes() {
+  const container = document.getElementById('lembretes-list');
+  const sorted = [...lembretes].sort((a,b) => a.data.localeCompare(b.data));
+  if (!sorted.length) { container.innerHTML = '<p style="color:var(--muted);font-size:14px">Nenhum lembrete cadastrado.</p>'; return; }
+  const today = new Date().toISOString().slice(0,10);
+  container.innerHTML = sorted.map(l => {
+    const urgent = !l.done && l.data <= today;
+    return `
+    <div class="reminder-card ${l.done?'done':urgent?'urgent':''}">
+      <div class="reminder-icon">${urgent?'🚨':l.done?'✅':'🔔'}</div>
+      <div class="reminder-info">
+        <strong>${l.pacienteNome}</strong> — ${l.tipo}
+        <p>${l.msg || ''} ${l.hora ? '· '+l.hora : ''}</p>
+      </div>
+      <div class="reminder-time">${formatDate(l.data)}</div>
+      <button class="btn btn-sm" style="background:#25D366;color:#fff;font-size:13px" onclick="sendWhatsAppLembrete('${l.id}')" title="Enviar via WhatsApp">📱 WhatsApp</button>
+      <button class="btn btn-sm btn-ghost" onclick="toggleLembrete('${l.id}')">${l.done?'Reabrir':'Concluir'}</button>
+      <button class="btn btn-sm btn-red" onclick="deleteLembrete('${l.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  document.getElementById('stat-pacientes').textContent = pacientes.length;
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('stat-hoje').textContent = consultas.filter(c => c.data === today).length;
+  const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
+  const weekStr = weekEnd.toISOString().slice(0,10);
+  document.getElementById('stat-semana').textContent = consultas.filter(c => c.data >= today && c.data <= weekStr).length;
+  document.getElementById('stat-lembretes').textContent = lembretes.filter(l => !l.done).length;
+  const tbody = document.getElementById('dash-consultas-tbody');
+  const upcoming = consultas.filter(c => c.data >= today && c.status !== 'Cancelado').sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora)).slice(0,8);
+  if (!upcoming.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px">Nenhuma consulta próxima.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = upcoming.map(c => `
+    <tr>
+      <td><strong>${c.pacienteNome}</strong></td>
+      <td>${formatDate(c.data)} às ${c.hora}</td>
+      <td>${c.especialidade}</td>
+      <td><span class="badge ${STATUS_BADGE[c.status]||'badge-gold'}">${c.status}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-sm" style="background:#25D366;color:#fff;font-size:13px" onclick="sendWhatsAppConsulta('${c.id}')" title="WhatsApp">📱</button>
+        <button class="btn btn-sm btn-red" onclick="deleteConsulta('${c.id}')">✕</button>
+      </td>
+    </tr>`).join('');
+}
+
+// ============================================================
+// AGENDA
+// ============================================================
+function renderAgenda() {
+  const grid = document.getElementById('agenda-grid');
+  const today = new Date();
+  const days = [];
+  // Start from Monday of current week
+  const dow = today.getDay(); // 0=Sun
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d);
+  }
+  const todayStr = today.toISOString().slice(0,10);
+  grid.innerHTML = days.map(d => {
+    const ds = d.toISOString().slice(0,10);
+    const dayConsultas = consultas.filter(c => c.data === ds).sort((a,b)=>a.hora.localeCompare(b.hora));
+    const isToday = ds === todayStr;
+    const dayNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    return `
+    <div class="day-col">
+      <div class="day-col-header ${isToday?'today':''}">
+        ${dayNames[d.getDay()]}
+        <span>${d.getDate()}</span>
+      </div>
+      ${dayConsultas.length ? dayConsultas.map(c=>`
+        <div class="appt-slot">
+          <div class="appt-time">${c.hora}</div>
+          <div class="appt-name">${c.pacienteNome}</div>
+          <div class="appt-spec">${c.especialidade}</div>
+        </div>`).join('') : '<div style="padding:14px 12px;font-size:12px;color:var(--muted)">Livre</div>'}
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// ESPECIALIDADES
+// ============================================================
+function renderEspecialidades() {
+  document.getElementById('spec-grid').innerHTML = ESPECIALIDADES.map(e => `
+    <div class="spec-card" onclick="filterByEsp('${e.nome}')">
+      <div class="spec-icon">${e.icon}</div>
+      <div>
+        <h4>${e.nome}</h4>
+        <p>${e.desc}</p>
+        <p style="margin-top:8px;font-size:11px;color:var(--gold);font-weight:600">
+          ${consultas.filter(c=>c.especialidade===e.nome).length} consultas
+        </p>
+      </div>
+    </div>`).join('');
+}
+
+function filterByEsp(nome) {
+  goTo('consultas');
+  document.getElementById('search-consultas').value = nome;
+  renderConsultasTable();
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function formatDate(s) {
+  if (!s) return '';
+  const [y,m,d] = s.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.getElementById('dash-date').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+// Pre-set today's date on modals
+const todayVal = new Date().toISOString().slice(0,10);
+document.getElementById('c-data').value = todayVal;
+document.getElementById('l-data').value = todayVal;
+
+renderDashboard();
+renderEspecialidades();
+</script>
+</body>
+</html>
